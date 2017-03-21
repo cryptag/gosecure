@@ -13,6 +13,7 @@ import (
 	"github.com/cryptag/gosecure/csp"
 	"github.com/cryptag/gosecure/frame"
 	"github.com/cryptag/gosecure/hsts"
+	"github.com/cryptag/gosecure/referrer"
 	"github.com/cryptag/gosecure/xss"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
@@ -42,7 +43,7 @@ func main() {
 	gotWarrant := false
 	middleware := alice.New(canary.GetHandler(&gotWarrant),
 		csp.GetHandler(*domain), hsts.PreloadHandler, frame.GetHandler,
-		content.GetHandler, xss.GetHandler)
+		content.GetHandler, xss.GetHandler, referrer.NoHandler)
 
 	srv := &http.Server{
 		Addr:         *httpsAddr,
