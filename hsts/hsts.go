@@ -21,7 +21,7 @@ func CustomHandler(h http.Handler, preload bool, maxAgeInSecs int) http.Handler 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		header := fmt.Sprintf("max-age=%d; includeSubDomains", maxAgeInSecs)
 		if preload {
-			header = "; preload"
+			header += "; preload"
 		}
 		w.Header().Add("Strict-Transport-Security", header)
 		h.ServeHTTP(w, req)
