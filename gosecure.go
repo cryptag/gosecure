@@ -10,6 +10,7 @@ import (
 
 	"github.com/cryptag/gosecure/canary"
 	"github.com/cryptag/gosecure/csp"
+	"github.com/cryptag/gosecure/frame"
 	"github.com/cryptag/gosecure/hsts"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
@@ -36,7 +37,7 @@ func main() {
 	// canary.Handler, too.
 	gotWarrant := false
 	middleware := alice.New(canary.GetHandler(&gotWarrant),
-		csp.GetHandler(*domain), hsts.PreloadHandler)
+		csp.GetHandler(*domain), hsts.PreloadHandler, frame.GetHandler)
 
 	srv := &http.Server{
 		Addr:         *httpsAddr,

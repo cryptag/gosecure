@@ -3,6 +3,8 @@ package hsts
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/cryptag/gosecure/set"
 )
 
 const oneYearInSeconds = 31536000 // 365 * 24 * 60 * 60
@@ -18,12 +20,9 @@ func PreloadHandler(h http.Handler) http.Handler {
 }
 
 func CustomHandler(h http.Handler, preload bool, maxAgeInSecs int) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		header := fmt.Sprintf("max-age=%d; includeSubDomains", maxAgeInSecs)
-		if preload {
-			header += "; preload"
-		}
-		w.Header().Add("Strict-Transport-Security", header)
-		h.ServeHTTP(w, req)
-	})
+	header := fmt.Sprintf("max-age=%d; includeSubDomains", maxAgeInSecs)
+	if preload {
+		header += "; preload"
+	}
+	return set.Header(h, "Strict-Transport-Security", header)
 }
