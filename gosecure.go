@@ -42,7 +42,7 @@ func main() {
 	// canary.Handler, too.
 	gotWarrant := false
 	middleware := alice.New(canary.GetHandler(&gotWarrant),
-		csp.GetHandler(*domain), hsts.PreloadHandler, frame.GetHandler,
+		csp.GetHandler(*domain), hsts.PreloadHandler, frame.DenyHandler,
 		content.GetHandler, xss.GetHandler, referrer.NoHandler)
 
 	srv := &http.Server{
