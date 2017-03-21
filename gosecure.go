@@ -5,6 +5,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/cryptag/gosecure/canary"
@@ -22,7 +23,8 @@ func main() {
 	flag.Parse()
 
 	// http://... -> https://...
-	go redirectToHTTPS(*httpAddr)
+	httpsPort := strings.SplitN(*httpsAddr, ":", 2)[1]
+	go redirectToHTTPS(*httpAddr, httpsPort)
 
 	r := mux.NewRouter()
 
@@ -48,17 +50,19 @@ func main() {
 	log.Fatal(srv.ListenAndServeTLS("", ""))
 }
 
-func redirectToHTTPS(httpAddr string) {
+func redirectToHTTPS(httpAddr, httpsPort string) {
 	srv := &http.Server{
 		Addr:         httpAddr,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 5 * time.Second,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			w.Header().Set("Connection", "close")
-			url := "https://" + req.Host + req.URL.String()
+			domain := strings.SplitN(req.Host, ":", 2)[0]
+			url := "https://" + domain + ":" + httpsPort + req.URL.String()
 			http.Redirect(w, req, url, http.StatusFound)
 		}),
 	}
+	log.Printf("Listening on %v\n", httpAddr)
 	log.Fatal(srv.ListenAndServe())
 }
 
